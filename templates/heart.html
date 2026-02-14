@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Valentine Heart 💖</title>
+
+<style>
+/* ===== BASIC PAGE ===== */
+body {
+    background: #ffe6f0;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+}
+
+/* ===== HEART OPENING MECHANISM ===== */
+.heart-container {
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* mask that "opens" horizontally */
+.heart-mask {
+    width: 160px;
+    overflow: hidden;
+    transition: clip-path 0.7s ease-in-out;
+    clip-path: inset(0 80px 0 80px); /* CLOSED */
+}
+
+/* OPEN STATE */
+.heart-open .heart-mask {
+    clip-path: inset(0 0 0 0); /* OPEN */
+}
+
+/* HEART SVG */
+.heart-svg {
+    width: 160px;
+    fill: #ff4d6d;
+    animation: beat 1.5s infinite ease-in-out;
+}
+
+/* Stop beat when open */
+.heart-open .heart-svg {
+    animation: none;
+}
+
+@keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* ===== MESSAGE ===== */
+#message {
+    margin-top: 15px;
+    font-size: 20px;
+    color: #b30059;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+#message.show-message {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== HEART RAIN ===== */
+.rain-heart {
+    position: fixed;
+    top: -10px;
+    font-size: 18px;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- click still works if you want -->
+    <div class="heart-container" onclick="openHeart()">
+        <div class="heart-mask">
+            <svg class="heart-svg" viewBox="0 0 32 29.6">
+                <path d="M23.6,0c-3.4,0-6.4,2.1-7.6,5.1
+                         C14.8,2.1,11.8,0,8.4,0
+                         C3.8,0,0,3.8,0,8.4
+                         c0,9.4,16,21.2,16,21.2
+                         s16-11.8,16-21.2
+                         C32,3.8,28.2,0,23.6,0z"/>
+            </svg>
+        </div>
+    </div>
+
+    <p id="message"></p>
+</div>
+
+<script>
+function openHeart() {
+    const heart = document.querySelector(".heart-container");
+    const msg = document.getElementById("message");
+
+    // open heart
+    heart.classList.add("heart-open");
+
+    // fetch message from Flask
+    fetch("/message")
+        .then(res => res.json())
+        .then(data => {
+            msg.innerText = data.message;
+            msg.classList.add("show-message");
+        });
+
+    startRain();
+
+    // close after 4 seconds
+    setTimeout(() => {
+        heart.classList.remove("heart-open");
+        msg.classList.remove("show-message");
+    }, 4000);
+}
+
+function startRain() {
+    for (let i = 0; i < 25; i++) {
+        setTimeout(() => {
+            const h = document.createElement("div");
+            h.className = "rain-heart";
+            h.innerText = "💖";
+            h.style.left = Math.random() * 100 + "vw";
+            h.style.animationDuration = (2 + Math.random() * 3) + "s";
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 5000);
+        }, i * 120);
+    }
+}
+
+/* ===== AUTO LOOP LOGIC (NEW) ===== */
+
+// start automatically after page load
+window.onload = () => {
+    openHeart();
+
+    // repeat every 7 seconds (4s open + 3s pause)
+    setInterval(openHeart, 7000);
+};
+</script>
+
+</body>
+</html>
