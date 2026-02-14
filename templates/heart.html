@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valentine Heart 💖</title>
 
 <style>
@@ -42,7 +43,7 @@ body {
 
 /* HEART SVG */
 .heart-svg {
-    width: 160px;
+    width: 100%;
     fill: #ff4d6d;
     animation: beat 1.5s infinite ease-in-out;
 }
@@ -59,7 +60,11 @@ body {
 
 /* ===== MESSAGE ===== */
 #message {
-    margin-top: 15px;
+    max-width: 90vw;
+    margin: 15px auto 0;
+    text-align: center;
+    word-wrap: break-word;
+
     font-size: 20px;
     color: #b30059;
     opacity: 0;
